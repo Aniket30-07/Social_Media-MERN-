@@ -102,3 +102,20 @@ export const getUser = (req, res) =>{
     //console.log(req.user) --> This gets the whole user data the previous part was for the verification
     res.status(200).json(req.user) // This will finally show the user on postman (means allow user to continue with the app after all the verifications)
 }
+
+
+
+//Logout User
+export const logoutUser = (req, res) => {
+    try {
+        res.clearCookie("token", cookieOptions)
+
+        return res.status(200).json({
+            message: "Logout Successful"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: "Internal Server Error!"
+        })
+    }
+}

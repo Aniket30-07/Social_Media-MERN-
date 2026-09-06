@@ -11,7 +11,7 @@ const isAuthenticated = async (req, res,next) =>{
         const token = req.cookies.token
 
         if(!token){
-            res.status(404).json({message : "No token Found !"})
+            return res.status(404).json({message : "No token Found !"})
         }
 
         const decoded = jwt.verify(token, process.env.jwt_secret)
@@ -20,7 +20,7 @@ const isAuthenticated = async (req, res,next) =>{
        // console.log(user) //--> This gives the complete user data
 
        if(!user){
-            res.status(404).json({message : "User not Found !"})
+            return res.status(404).json({message : "User not Found !"})
        }
 
        req.user = user
