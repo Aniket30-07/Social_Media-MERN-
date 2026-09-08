@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom'
 
 
 function ProtectedRoute({children}){
-    const [user, loading] = useAuth()
+    const {user, loading} = useAuth()
     const navigate = useNavigate()
 
     if(loading){
@@ -12,7 +12,7 @@ function ProtectedRoute({children}){
     }
 
     if(!user){
-        navigate('/login')
+        return navigate('/login')
     }
 
 
