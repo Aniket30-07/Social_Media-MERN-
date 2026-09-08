@@ -1,5 +1,5 @@
 import { createContext, use, useContext, useEffect, useState } from "react"
-import axiosInstance from "../vite-project/axiosCalls/axios"
+import axiosInstance from "../axiosCalls/axios"
 
 
 const AuthContext = createContext()
