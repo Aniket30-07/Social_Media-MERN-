@@ -13,7 +13,7 @@ function PublicRoute({children}){
         return Navigate('/home')
     }
 
-
+    console.log(children)
     return children
 }
 
