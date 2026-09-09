@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
-import axiosInstance from '../../axiosCalls/axios';
+import axiosInstance from '../axiosCalls/axios';
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
