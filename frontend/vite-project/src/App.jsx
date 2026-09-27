@@ -7,6 +7,7 @@ import Home from './pages/Home.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import PublicRoute from './components/PublicRoute.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import Profile from './pages/Profile.jsx'
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
             <Route path='/login' element={<PublicRoute><Login /></PublicRoute>} />
             <Route path='/signup' element={<PublicRoute><SignUp /></PublicRoute>} />
             <Route path='/home' element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path='/profile/:username' element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

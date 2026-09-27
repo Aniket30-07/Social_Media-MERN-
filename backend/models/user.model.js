@@ -55,8 +55,7 @@ const userSchema = new mongoose.Schema({
         //stores urls
         type : String
     }
-
-})
+}, { timestamps: true })
 
 
 
