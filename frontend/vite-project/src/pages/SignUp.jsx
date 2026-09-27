@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, ArrowRight, Sparkles } from 'lucide-react';
 import axiosInstance from '../axiosCalls/axios';
+import { useAuth } from '../context/AuthContext';
 
 function SignUp() {
+  const { setUser } = useAuth();
   const [form, setForm] = useState({ name: "", email: "", username: "", password: "" });
   const [err, setErr] = useState('');
   const [loader, setLoader] = useState(false);
@@ -19,11 +21,15 @@ function SignUp() {
     setErr('');
     setLoader(true);
     try {
-      await axiosInstance.post('/users/register', form);
+      const response = await axiosInstance.post('/users/register', form);
       console.log('User Registered');
+      setUser(response.data);
       navigate('/home');
     } catch (error) {
       console.log(error);
+      setErr(error.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -53,6 +59,11 @@ function SignUp() {
         </div>
 
         <form className="mt-8 space-y-6">
+          {err && (
+            <div className="bg-red-50 text-red-500 p-3 rounded-xl text-sm border border-red-200 text-center font-medium">
+              {err}
+            </div>
+          )}
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="name">Full Name</label>
