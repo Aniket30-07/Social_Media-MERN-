@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, ArrowRight, Sparkles } from 'lucide-react';
-import axiosInstance from '../../axiosCalls/axios';
+import axiosInstance from '../axiosCalls/axios';
 
 function SignUp() {
   const [form, setForm] = useState({ name: "", email: "", username: "", password: "" });

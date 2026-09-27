@@ -3,17 +3,17 @@ import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
 
 function PublicRoute({children}){
-    const{user, loading} = useAuth()
+    const {user, loader} = useAuth()
 
-    if(loading){
+    if(loader){
         return <h1>Loading...</h1>
     }
 
     if(user){
-        return Navigate('/home')
+        return <Navigate to="/home" replace />
     }
 
-    console.log(children)
+    //console.log(children)
     return children
 }
 
