@@ -24,7 +24,7 @@ function SignUp() {
       const response = await axiosInstance.post('/users/register', form);
       console.log('User Registered');
       setUser(response.data);
-      navigate('/home');
+      navigate('/home', { replace: true });
     } catch (error) {
       console.log(error);
       setErr(error.response?.data?.message || 'Registration failed. Please try again.');
@@ -58,7 +58,7 @@ function SignUp() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6">
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {err && (
             <div className="bg-red-50 text-red-500 p-3 rounded-xl text-sm border border-red-200 text-center font-medium">
               {err}
@@ -149,12 +149,12 @@ function SignUp() {
 
           <div>
             <button
-              type="button"
-              onClick={handleSubmit}
-              className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+              type="submit"
+              disabled={loader}
+              className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
             >
-              Create Account
-              <ArrowRight className="ml-2 h-4 w-4 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+              {loader ? 'Creating Account...' : 'Create Account'}
+              {!loader && <ArrowRight className="ml-2 h-4 w-4 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />}
             </button>
           </div>
           

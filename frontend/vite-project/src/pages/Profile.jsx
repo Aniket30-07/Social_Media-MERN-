@@ -1,16 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../axiosCalls/axios";
+import { useAuth } from "../context/AuthContext";
 
 function Profile() {
     const { username } = useParams()
+    const { user } = useAuth()
     const [userData, setUserData] = useState(null)
     const [loading, setLoading] = useState(true)
 
+    const profileUsername = username || user?.username
+
     useEffect(() => {
         const fetchProfile = async () => {
+            if (!profileUsername) return;
             try {
-                const response = await axiosInstance.get(`/users/profile/${username}`)
+                const response = await axiosInstance.get(`/users/profile/${profileUsername}`)
                 setUserData(response.data.userData)
             } catch (error) {
                 console.error(error)
@@ -20,7 +25,7 @@ function Profile() {
         }
 
         fetchProfile()
-    }, [username])
+    }, [profileUsername])
 
     if (loading) {
         return (

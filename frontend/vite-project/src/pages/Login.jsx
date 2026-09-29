@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 import axiosInstance from '../axiosCalls/axios';
+import { useAuth } from '../context/AuthContext';
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -9,6 +10,7 @@ function Login() {
   const [loader, setLoader] = useState(false);
 
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -19,10 +21,14 @@ function Login() {
     setErr('');
     setLoader(true);
     try {
-      await axiosInstance.post('/users/login', form);
-      navigate('/home');
+      const response = await axiosInstance.post('/users/login', form);
+      setUser(response.data.user);
+      navigate('/home', { replace: true });
     } catch (error) {
       console.log(error);
+      setErr(error.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -51,7 +57,9 @@ function Login() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6">
+        {err && <div className="mt-4 p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium text-center border border-red-100">{err}</div>}
+
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">Email address</label>
@@ -99,12 +107,12 @@ function Login() {
 
           <div>
             <button
-              type="button"
-              onClick={handleSubmit}
-              className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+              type="submit"
+              disabled={loader}
+              className="group relative w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
             >
-              Sign in
-              <ArrowRight className="ml-2 h-4 w-4 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+              {loader ? 'Signing in...' : 'Sign in'}
+              {!loader && <ArrowRight className="ml-2 h-4 w-4 opacity-70 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />}
             </button>
           </div>
           
