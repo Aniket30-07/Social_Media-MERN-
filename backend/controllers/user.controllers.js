@@ -138,3 +138,22 @@ export const getUserProfile = async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error" })
     }
 }
+
+//Followers and Followings
+
+export const followUser = async(req, res) =>{
+    try {
+        //Check if the id is same as the logged in user as the user cannot follow themselves
+
+        
+
+        //If we are already following the user  --> Implement Unfollow 
+
+        
+
+        //If we are not following the user --> Implement Follow
+        
+    } catch (error) {
+        
+    }
+}

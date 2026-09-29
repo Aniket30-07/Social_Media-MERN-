@@ -20,5 +20,7 @@ userRoutes.post('/logout', logoutUser)
 //Profile
 userRoutes.get('/profile/:username', isAuthenticated, getUserProfile)
 
+//Followers and Followings
+
 
 export default userRoutes
