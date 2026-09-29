@@ -49,18 +49,18 @@ function Profile() {
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
-                
+
                 {/* Profile Header Card */}
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                    
+
                     {/* Cover Photo */}
                     <div className="h-48 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 w-full relative">
                         {/* Profile Avatar */}
                         <div className="absolute -bottom-16 left-8">
                             <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-white shadow-md">
-                                <img 
-                                    src={userData.profileImage || defaultAvatar} 
-                                    alt={userData.username} 
+                                <img
+                                    src={userData.profileImage || defaultAvatar}
+                                    alt={userData.username}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
@@ -74,12 +74,39 @@ function Profile() {
                                 <h1 className="text-3xl font-bold text-gray-900">{userData.name}</h1>
                                 <p className="text-lg text-gray-500 font-medium">@{userData.username}</p>
                             </div>
-                            
+
                             {/* Action Buttons */}
                             <div className="flex gap-3">
-                                <button className="px-6 py-2 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-full transition-colors shadow-sm">
-                                    Follow
-                                </button>
+                                {user?._id !== userData._id && (
+                                    <button
+                                        onClick={async () => {
+                                            const isFollowing = userData.followers?.some(f => f._id === user?._id);
+                                            try {
+                                                if (isFollowing) {
+                                                    await axiosInstance.delete(`/users/${userData._id}/follow`);
+                                                    setUserData(prev => ({
+                                                        ...prev,
+                                                        followers: prev.followers.filter(f => f._id !== user._id)
+                                                    }));
+                                                } else {
+                                                    await axiosInstance.post(`/users/${userData._id}/follow`);
+                                                    setUserData(prev => ({
+                                                        ...prev,
+                                                        followers: [...(prev.followers || []), { _id: user._id, name: user.name, username: user.username, profileImage: user.profileImage }]
+                                                    }));
+                                                }
+                                            } catch (error) {
+                                                console.error("Error toggling follow status:", error);
+                                            }
+                                        }}
+                                        className={`px-6 py-2 font-semibold rounded-full transition-colors shadow-sm ${userData.followers?.some(f => f._id === user?._id)
+                                                ? "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                                                : "bg-gray-900 hover:bg-gray-800 text-white"
+                                            }`}
+                                    >
+                                        {userData.followers?.some(f => f._id === user?._id) ? 'Unfollow' : 'Follow'}
+                                    </button>
+                                )}
                                 <button className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-full transition-colors">
                                     Message
                                 </button>
@@ -126,7 +153,7 @@ function Profile() {
                             </li>
                         </ul>
                     </div>
-                    
+
                     {/* Empty State for Posts */}
                     <div className="flex flex-col items-center justify-center h-64 text-gray-400">
                         <div className="w-16 h-16 mb-4 rounded-full bg-gray-50 flex items-center justify-center">
