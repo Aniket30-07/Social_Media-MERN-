@@ -143,17 +143,46 @@ export const getUserProfile = async (req, res) => {
 
 export const followUser = async(req, res) =>{
     try {
+
+        const currentUserId = req.user._id //This comes from the user route --> current user
+        const targetUserId = req.params.id //This comes from the route call of follow and following
+
         //Check if the id is same as the logged in user as the user cannot follow themselves
-
+        if(currentUserId.toString() === targetUserId.toString()){
+            return res.status(409).json({message : "You cannot follow yourself"})
+        }
         
 
-        //If we are already following the user  --> Implement Unfollow 
+        //If we are already following the user  --> Implement Unfollow --> We need to check if we are present in targetUserId's list
+        const targetUser = await User.findById(targetUserId)
 
+        if(!targetUser){
+            return res.status(404).json({message : "No Target User Found"})
+        }
+
+        const alreadyFollowing = targetUser.followers.some((id)=>{
+            return id.toString() === currentUserId.toString()
+        })
         
+        if(alreadyFollowing){
+            return res.status(409).json({message : "You are already following"}) //For this we have to show an unfollow button for our client - side
+        }
 
         //If we are not following the user --> Implement Follow
+        //We can push it to the required array through push operation but we will use MongoDB opeartors for this 
+        await User.findByIdAndUpdate(targetUserId, {
+            $addToSet : {followers : currentUserId}
+        })
+
+        await User.findByIdAndUpdate(currentUserId, {
+            $addToSet : {followings : targetUserId}
+        })
+
+        return res.status(201).json({message : "User Followed"})
         
-    } catch (error) {
-        
+    } 
+    catch (error) {
+        console.log(error)
+        return res.status(500).json({message : "Internal Server Error"})
     }
 }
