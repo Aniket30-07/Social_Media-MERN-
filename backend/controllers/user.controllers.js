@@ -125,7 +125,10 @@ export const logoutUser = async (req, res) => {
 export const getUserProfile = async (req, res) => {
     try {
         const { username } = req.params
-        const userData = await User.findOne({ username }).select("-password")
+        const userData = await User.findOne({ username })
+                        .select("-password")
+                        .populate("followers", "name username profileImage")
+                        .populate("followings", "name username profileImage");
 
         if(!userData){
             return res.status(404).json({message : "User Not Found"})
