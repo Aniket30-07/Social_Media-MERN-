@@ -21,6 +21,7 @@ userRoutes.post('/logout', logoutUser)
 userRoutes.get('/profile/:username', isAuthenticated, getUserProfile)
 
 //Followers and Followings
-
+userRoutes.post("/:id/follow", isAuthenticated, followUser);
+userRoutes.delete("/:id/follow", isAuthenticated, unfollowUser);
 
 export default userRoutes
