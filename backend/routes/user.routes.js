@@ -1,6 +1,7 @@
 import express from 'express'
 import { getUser, loginUser, registerUser, logoutUser, getUserProfile, followUser, unfollowUser } from '../controllers/user.controllers.js'
 import isAuthenticated from '../middlewares/authMiddleware.js'
+import upload from '../middlewares/upload.middleware.js'
 
 const userRoutes = express.Router()
 
@@ -23,5 +24,8 @@ userRoutes.get('/profile/:username', isAuthenticated, getUserProfile)
 //Followers and Followings
 userRoutes.post("/:id/follow", isAuthenticated, followUser);
 userRoutes.delete("/:id/follow", isAuthenticated, unfollowUser);
+
+//Middleware for multer
+userRoutes.post('/testUpload', isAuthenticated, upload.single('profileImage'), testUpload)
 
 export default userRoutes
