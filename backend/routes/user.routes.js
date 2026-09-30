@@ -1,5 +1,5 @@
 import express from 'express'
-import { getUser, loginUser, registerUser, logoutUser, getUserProfile, followUser, unfollowUser } from '../controllers/user.controllers.js'
+import { getUser, loginUser, registerUser, logoutUser, getUserProfile, followUser, unfollowUser, testUpload } from '../controllers/user.controllers.js'
 import isAuthenticated from '../middlewares/authMiddleware.js'
 import upload from '../middlewares/upload.middleware.js'
 

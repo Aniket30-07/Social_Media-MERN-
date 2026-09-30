@@ -223,3 +223,20 @@ export const unfollowUser = async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
+// Test Upload
+export const testUpload = (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded!" });
+        }
+        return res.status(200).json({ 
+            message: "File uploaded successfully", 
+            file: req.file 
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
