@@ -8,6 +8,7 @@ function Profile() {
     const { user } = useAuth()
     const [userData, setUserData] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [activeTab, setActiveTab] = useState('posts')
 
     const profileUsername = username || user?.username
 
@@ -122,15 +123,15 @@ function Profile() {
 
                         {/* Stats Section */}
                         <div className="flex items-center gap-8 mt-8 border-t border-gray-100 pt-6">
-                            <div className="flex flex-col items-center sm:items-start">
+                            <div className="flex flex-col items-center sm:items-start cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setActiveTab('posts')}>
                                 <span className="text-2xl font-bold text-gray-900">{userData.posts?.length || 0}</span>
                                 <span className="text-sm text-gray-500 font-medium uppercase tracking-wider">Posts</span>
                             </div>
-                            <div className="flex flex-col items-center sm:items-start">
+                            <div className="flex flex-col items-center sm:items-start cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setActiveTab('followers')}>
                                 <span className="text-2xl font-bold text-gray-900">{userData.followers?.length || 0}</span>
                                 <span className="text-sm text-gray-500 font-medium uppercase tracking-wider">Followers</span>
                             </div>
-                            <div className="flex flex-col items-center sm:items-start">
+                            <div className="flex flex-col items-center sm:items-start cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setActiveTab('following')}>
                                 <span className="text-2xl font-bold text-gray-900">{userData.followings?.length || 0}</span>
                                 <span className="text-sm text-gray-500 font-medium uppercase tracking-wider">Following</span>
                             </div>
@@ -142,29 +143,77 @@ function Profile() {
                 <div className="mt-8 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 min-h-[400px]">
                     <div className="border-b border-gray-100 pb-4 mb-6">
                         <ul className="flex space-x-8">
-                            <li className="text-purple-600 font-semibold border-b-2 border-purple-600 pb-4 -mb-[18px] cursor-pointer">
+                            <li 
+                                onClick={() => setActiveTab('posts')}
+                                className={`${activeTab === 'posts' ? 'text-purple-600 font-semibold border-b-2 border-purple-600' : 'text-gray-500 font-medium hover:text-gray-900'} pb-4 -mb-[26px] cursor-pointer transition-colors`}>
                                 Posts
                             </li>
-                            <li className="text-gray-500 font-medium hover:text-gray-900 cursor-pointer transition-colors">
-                                Reels
+                            <li 
+                                onClick={() => setActiveTab('followers')}
+                                className={`${activeTab === 'followers' ? 'text-purple-600 font-semibold border-b-2 border-purple-600' : 'text-gray-500 font-medium hover:text-gray-900'} pb-4 -mb-[26px] cursor-pointer transition-colors`}>
+                                Followers
                             </li>
-                            <li className="text-gray-500 font-medium hover:text-gray-900 cursor-pointer transition-colors">
-                                Tagged
+                            <li 
+                                onClick={() => setActiveTab('following')}
+                                className={`${activeTab === 'following' ? 'text-purple-600 font-semibold border-b-2 border-purple-600' : 'text-gray-500 font-medium hover:text-gray-900'} pb-4 -mb-[26px] cursor-pointer transition-colors`}>
+                                Following
                             </li>
                         </ul>
                     </div>
-
-                    {/* Empty State for Posts */}
-                    <div className="flex flex-col items-center justify-center h-64 text-gray-400">
-                        <div className="w-16 h-16 mb-4 rounded-full bg-gray-50 flex items-center justify-center">
-                            <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
+                    
+                    {/* Content Section */}
+                    {activeTab === 'posts' && (
+                        <div className="flex flex-col items-center justify-center h-64 text-gray-400">
+                            <div className="w-16 h-16 mb-4 rounded-full bg-gray-50 flex items-center justify-center">
+                                <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900">No Posts Yet</h3>
+                            <p className="mt-1 text-sm text-gray-500">When this user posts, you'll see them here.</p>
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900">No Posts Yet</h3>
-                        <p className="mt-1 text-sm text-gray-500">When this user posts, you'll see them here.</p>
-                    </div>
+                    )}
+
+                    {activeTab === 'followers' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {userData.followers?.length > 0 ? (
+                                userData.followers.map(f => (
+                                    <div key={f._id} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-sm transition-shadow cursor-pointer">
+                                        <img src={f.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(f.name || f.username)}&background=random&size=150`} alt={f.username} className="w-12 h-12 rounded-full object-cover border border-gray-200" />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-semibold text-gray-900 truncate">{f.name}</p>
+                                            <p className="text-sm text-gray-500 truncate">@{f.username}</p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="col-span-full flex flex-col items-center justify-center h-64 text-gray-400">
+                                    <p className="mt-1 text-base text-gray-500">No followers yet.</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {activeTab === 'following' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {userData.followings?.length > 0 ? (
+                                userData.followings.map(f => (
+                                    <div key={f._id} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:shadow-sm transition-shadow cursor-pointer">
+                                        <img src={f.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(f.name || f.username)}&background=random&size=150`} alt={f.username} className="w-12 h-12 rounded-full object-cover border border-gray-200" />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-semibold text-gray-900 truncate">{f.name}</p>
+                                            <p className="text-sm text-gray-500 truncate">@{f.username}</p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="col-span-full flex flex-col items-center justify-center h-64 text-gray-400">
+                                    <p className="mt-1 text-base text-gray-500">Not following anyone yet.</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
