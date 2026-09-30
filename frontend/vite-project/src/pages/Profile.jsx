@@ -9,6 +9,29 @@ function Profile() {
     const [userData, setUserData] = useState(null)
     const [loading, setLoading] = useState(true)
     const [activeTab, setActiveTab] = useState('posts')
+    const [isEditOpen, setIsEditOpen] = useState(false)
+    const [editForm, setEditForm] = useState({ name: '', username: '', email: '', bio: '' })
+
+    const openEditProfile = () => {
+        setEditForm({
+            name: userData?.name || '',
+            username: userData?.username || '',
+            email: userData?.email || '',
+            bio: userData?.bio || ''
+        })
+        setIsEditOpen(true)
+    }
+
+    const handleEditChange = (event) => {
+        const { name, value } = event.target
+        setEditForm((prev) => ({ ...prev, [name]: value }))
+    }
+
+    const handleEditSubmit = (event) => {
+        event.preventDefault()
+        setUserData((prev) => ({ ...prev, ...editForm }))
+        setIsEditOpen(false)
+    }
 
     const profileUsername = username || user?.username
 
@@ -78,7 +101,14 @@ function Profile() {
 
                             {/* Action Buttons */}
                             <div className="flex gap-3">
-                                {user?._id !== userData._id && (
+                                {user?._id === userData._id ? (
+                                    <button 
+                                        onClick={openEditProfile}
+                                        className="px-6 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-900 font-semibold rounded-full transition-colors shadow-sm"
+                                    >
+                                        Edit Profile
+                                    </button>
+                                ) : (
                                     <button
                                         onClick={async () => {
                                             const isFollowing = userData.followers?.some(f => f._id === user?._id);
@@ -216,6 +246,90 @@ function Profile() {
                     )}
                 </div>
             </div>
+
+            {/* Edit Profile Modal */}
+            {user?._id === userData._id && isEditOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm transition-all">
+                    <div className="w-full max-w-lg rounded-3xl bg-white p-8 shadow-2xl">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-900">Edit Profile</h2>
+                                <p className="text-sm text-gray-500 mt-1">Update your profile details.</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsEditOpen(false)}
+                                className="text-gray-400 hover:text-gray-700 text-3xl leading-none transition-colors"
+                                aria-label="Close edit profile"
+                            >
+                                &times;
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleEditSubmit} className="space-y-5">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Name</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={editForm.name}
+                                    onChange={handleEditChange}
+                                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all bg-gray-50 focus:bg-white"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Username</label>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    value={editForm.username}
+                                    onChange={handleEditChange}
+                                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all bg-gray-50 focus:bg-white"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={editForm.email}
+                                    onChange={handleEditChange}
+                                    className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all bg-gray-50 focus:bg-white"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Bio</label>
+                                <textarea
+                                    name="bio"
+                                    value={editForm.bio}
+                                    onChange={handleEditChange}
+                                    rows="4"
+                                    className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all bg-gray-50 focus:bg-white"
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsEditOpen(false)}
+                                    className="px-6 py-2.5 rounded-full border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-6 py-2.5 rounded-full bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-colors shadow-md"
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
