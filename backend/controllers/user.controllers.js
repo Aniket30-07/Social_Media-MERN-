@@ -2,7 +2,7 @@ import { response } from "express"
 import User from "../models/user.model.js"
 import bcrypt from 'bcryptjs'
 import genToken from "../utils/genToken.js"
-import uploadToCloudinary from "../utils/uploadCloudinary.js"
+import uploadToCloudinary from "../utils/uploadToCloudinary.js"
 
 
 const cookieOptions = {
