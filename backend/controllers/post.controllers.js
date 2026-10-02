@@ -25,6 +25,9 @@ export const createPost = async (req, res) => {
             image
         })
 
+        //extract username, name, profileImage from author
+        // save post id for the user
+
 
         res.status(201).json({message : "Post Created" , post : post})
 
