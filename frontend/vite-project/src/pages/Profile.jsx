@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axiosInstance from "../axiosCalls/axios";
 import { useAuth } from "../context/AuthContext";
 
 function Profile() {
     const { username } = useParams()
+    const navigate = useNavigate()
     const { user, setUser } = useAuth()
     const [userData, setUserData] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -13,6 +14,20 @@ function Profile() {
     const [editForm, setEditForm] = useState({ name: '', username: '', email: '', bio: '' })
     const [selectedImage, setSelectedImage] = useState(null)
     const [previewImage, setPreviewImage] = useState('')
+    const [editError, setEditError] = useState('')
+    const [editLoading, setEditLoading] = useState(false)
+    const fileInputRef = useRef(null)
+
+    const closeEditProfile = () => {
+        if (editLoading) return
+        setIsEditOpen(false)
+        setSelectedImage(null)
+        setEditError('')
+        setPreviewImage('')
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+        }
+    }
 
     const openEditProfile = () => {
         setEditForm({
@@ -23,6 +38,7 @@ function Profile() {
         })
         setSelectedImage(null)
         setPreviewImage('')
+        setEditError('')
         setIsEditOpen(true)
     }
 
@@ -35,19 +51,44 @@ function Profile() {
         const file = event.target.files?.[0]
         if (!file) return
 
+        if (!file.type.startsWith('image/')) {
+            setEditError('Please select a valid image file.')
+            event.target.value = ''
+            return
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            setEditError('Profile image must be 5MB or smaller.')
+            event.target.value = ''
+            return
+        }
+
+        setEditError('')
         setSelectedImage(file)
+        
+        if (previewImage) {
+            URL.revokeObjectURL(previewImage)
+        }
         const previewUrl = URL.createObjectURL(file)
         setPreviewImage(previewUrl)
     }
 
     const handleEditSubmit = async (event) => {
         event.preventDefault()
+        setEditError('')
+        
+        if (!editForm.name.trim() || !editForm.username.trim() || !editForm.email.trim()) {
+            setEditError('Name, username and email are required.')
+            return
+        }
+        
         try {
+            setEditLoading(true)
             const formData = new FormData()
-            formData.append('name', editForm.name)
-            formData.append('username', editForm.username)
-            formData.append('email', editForm.email)
-            formData.append('bio', editForm.bio)
+            formData.append('name', editForm.name.trim())
+            formData.append('username', editForm.username.trim())
+            formData.append('email', editForm.email.trim())
+            formData.append('bio', editForm.bio.trim())
             if (selectedImage) {
                 formData.append('profileImage', selectedImage)
             }
@@ -58,16 +99,37 @@ function Profile() {
                 }
             })
 
-            setUserData(response.data.user)
-            if (user && user._id === response.data.user._id) {
-                setUser(response.data.user)
+            const updatedUser = response.data.user
+            setUserData(updatedUser)
+            
+            if (user && user._id === updatedUser._id) {
+                setUser({
+                    ...user,
+                    ...updatedUser
+                })
             }
-            setIsEditOpen(false)
+
+            const usernameChanged = updatedUser.username !== (username || user?.username)
+            closeEditProfile()
+
+            if (usernameChanged) {
+                navigate(`/profile/${updatedUser.username}`, { replace: true })
+            }
         } catch (error) {
             console.error("Error updating profile:", error)
-            alert(error.response?.data?.message || "Failed to update profile")
+            setEditError(error.response?.data?.message || 'Unable to update profile. Please try again.')
+        } finally {
+            setEditLoading(false)
         }
     }
+
+    useEffect(() => {
+        return () => {
+            if (previewImage) {
+                URL.revokeObjectURL(previewImage)
+            }
+        }
+    }, [previewImage])
 
     const profileUsername = username || user?.username
 
@@ -294,8 +356,9 @@ function Profile() {
                             </div>
                             <button
                                 type="button"
-                                onClick={() => setIsEditOpen(false)}
-                                className="text-gray-400 hover:text-gray-700 text-3xl leading-none transition-colors"
+                                onClick={closeEditProfile}
+                                disabled={editLoading}
+                                className="text-gray-400 hover:text-gray-700 text-3xl leading-none transition-colors disabled:opacity-50"
                                 aria-label="Close edit profile"
                             >
                                 &times;
@@ -303,6 +366,11 @@ function Profile() {
                         </div>
 
                         <form onSubmit={handleEditSubmit} className="space-y-5">
+                            {editError && (
+                                <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+                                    {editError}
+                                </div>
+                            )}
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Profile Picture</label>
                                 <div className="flex items-center gap-4">
@@ -317,6 +385,7 @@ function Profile() {
                                             <input
                                                 type="file"
                                                 accept="image/*"
+                                                ref={fileInputRef}
                                                 onChange={handleImageChange}
                                                 className="hidden"
                                             />
@@ -378,16 +447,18 @@ function Profile() {
                             <div className="flex justify-end gap-3 pt-4">
                                 <button
                                     type="button"
-                                    onClick={() => setIsEditOpen(false)}
-                                    className="px-6 py-2.5 rounded-full border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+                                    onClick={closeEditProfile}
+                                    disabled={editLoading}
+                                    className="px-6 py-2.5 rounded-full border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-50"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-6 py-2.5 rounded-full bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-colors shadow-md"
+                                    disabled={editLoading}
+                                    className="px-6 py-2.5 rounded-full bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-colors shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
-                                    Save Changes
+                                    {editLoading ? 'Saving...' : 'Save Changes'}
                                 </button>
                             </div>
                         </form>
