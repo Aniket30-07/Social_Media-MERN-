@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 
 function Profile() {
     const { username } = useParams()
-    const { user } = useAuth()
+    const { user, setUser } = useAuth()
     const [userData, setUserData] = useState(null)
     const [loading, setLoading] = useState(true)
     const [activeTab, setActiveTab] = useState('posts')
@@ -40,14 +40,33 @@ function Profile() {
         setPreviewImage(previewUrl)
     }
 
-    const handleEditSubmit = (event) => {
+    const handleEditSubmit = async (event) => {
         event.preventDefault()
-        setUserData((prev) => ({ 
-            ...prev, 
-            ...editForm,
-            profileImage: previewImage || prev.profileImage
-        }))
-        setIsEditOpen(false)
+        try {
+            const formData = new FormData()
+            formData.append('name', editForm.name)
+            formData.append('username', editForm.username)
+            formData.append('email', editForm.email)
+            formData.append('bio', editForm.bio)
+            if (selectedImage) {
+                formData.append('profileImage', selectedImage)
+            }
+
+            const response = await axiosInstance.put('/users/profile', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+
+            setUserData(response.data.user)
+            if (user && user._id === response.data.user._id) {
+                setUser(response.data.user)
+            }
+            setIsEditOpen(false)
+        } catch (error) {
+            console.error("Error updating profile:", error)
+            alert(error.response?.data?.message || "Failed to update profile")
+        }
     }
 
     const profileUsername = username || user?.username
