@@ -1,5 +1,5 @@
 import express from 'express'
-import { getUser, loginUser, registerUser, logoutUser, getUserProfile, followUser, unfollowUser, testUpload } from '../controllers/user.controllers.js'
+import { getUser, loginUser, registerUser, logoutUser, getUserProfile, followUser, unfollowUser, updateProfile } from '../controllers/user.controllers.js'
 import isAuthenticated from '../middlewares/authMiddleware.js'
 import upload from '../middlewares/upload.middleware.js'
 
@@ -25,7 +25,7 @@ userRoutes.get('/profile/:username', isAuthenticated, getUserProfile)
 userRoutes.post("/:id/follow", isAuthenticated, followUser);
 userRoutes.delete("/:id/follow", isAuthenticated, unfollowUser);
 
-//Middleware for multer
-userRoutes.post('/testUpload', isAuthenticated, upload.single('profileImage'), testUpload)
+//Update Profile
+userRoutes.put('/profile', isAuthenticated, upload.single('profileImage'), updateProfile)
 
 export default userRoutes

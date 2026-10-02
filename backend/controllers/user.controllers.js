@@ -2,6 +2,7 @@ import { response } from "express"
 import User from "../models/user.model.js"
 import bcrypt from 'bcryptjs'
 import genToken from "../utils/genToken.js"
+import uploadToCloudinary from "../utils/uploadCloudinary.js"
 
 
 const cookieOptions = {
@@ -224,18 +225,46 @@ export const unfollowUser = async (req, res) => {
     }
 };
 
-//Middleware for Multer
-
-export const testUpload = async (req, res) => {
+//Update Profile
+export const updateProfile = async (req, res, next) => {
     try {
-        if (!req.file) {
-            return res.status(409).json({ message: "No file uploaded" })
+        const userId = req.user._id;
+        const { name, username, email, bio } = req.body;
+
+        if (!name?.trim() || !username?.trim() || !email?.trim()) {
+            return res.status(400).json({ message: "Name, username and email are required" });
         }
-        //res.send(req.file)
-        const result = await uploadToCloudinary(req.file.buffer)
-        res.send(result)
-    }
-    catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" })
+
+        const cleanUsername = username.trim();
+        const normalizedEmail = email.trim().toLowerCase();
+
+        if (await User.findOne({ username: cleanUsername, _id: { $ne: userId } })) {
+            return res.status(409).json({ message: "Username already exists" });
+        }
+
+        if (await User.findOne({ email: normalizedEmail, _id: { $ne: userId } })) {
+            return res.status(409).json({ message: "Email already exists" });
+        }
+
+        const updates = {
+            name: name.trim(),
+            username: cleanUsername,
+            email: normalizedEmail,
+            bio: bio?.trim() || "",
+        };
+
+        if (req.file) {
+            const uploadedImage = await uploadToCloudinary(req.file.buffer);
+            updates.profileImage = uploadedImage.secure_url;
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updates, {
+            new: true,
+            runValidators: true
+        }).select("-password");
+
+        return res.status(200).json({ message: "Profile updated successfully", user: updatedUser });
+    } catch (error) {
+        next(error);
     }
 }
