@@ -8,7 +8,7 @@ export const createPost = async (req, res) => {
         const { caption } = req.body
 
         if (caption.length > 500) {
-            res.status(401).json({ message: 'Caption Cannot be more than 500 characters ' })
+            return res.status(401).json({ message: 'Caption Cannot be more than 500 characters ' })
         }
 
 
