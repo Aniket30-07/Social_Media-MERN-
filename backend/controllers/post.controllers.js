@@ -80,7 +80,7 @@ export const updateLikes = async(req, res) =>{
         //get user id
         const userId = req.user._id
 
-        const isAlreadyLiked = await Post.likes.some((id)=> id === userId)
+        const isAlreadyLiked =  post.likes.some((id)=> id.toString() === userId.toString())
 
         if(isAlreadyLiked){
             post.likes.pull(userId)
