@@ -63,3 +63,38 @@ export const getPosts = async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
+
+//delete posts
+
+//Update Likes
+export const updateLikes = async(req, res) =>{
+    try {
+        //get post id
+        const post = await Post.findById(req.params.id)
+
+        if(!post){
+            return res.status(404).json({message : "No post found"})
+        }
+        
+        //get user id
+        const userId = req.user._id
+
+        const isAlreadyLiked = await Post.likes.some((id)=> id === userId)
+
+        if(isAlreadyLiked){
+            post.likes.pull(userId)
+        }
+        else{
+            post.likes.push(userId)
+        }
+
+        await post.save()
+
+        res.status(200).json({message : isAlreadyLiked? "Post Unliked" : "Post Liked", likes : post.likes.length})
+        
+    } 
+    catch (error) {
+        return res.status(500).json({message : "Internal Server Error"})
+    }
+}
