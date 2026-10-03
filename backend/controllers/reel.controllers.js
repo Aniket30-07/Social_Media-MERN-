@@ -64,3 +64,38 @@ export const getReels = async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
+//delete reels
+
+//Update Likes
+export const updateLikes = async(req, res) =>{
+    try {
+        //get post id
+        const reel = await Reel.findById(req.params.id)
+
+        if(!reel){
+            return res.status(404).json({message : "No post found"})
+        }
+        
+        //get user id
+        const userId = req.user._id
+
+        const isAlreadyLiked =  reel.likes.some((id)=> id.toString() === userId.toString())
+
+        if(isAlreadyLiked){
+            reel.likes.pull(userId)
+        }
+        else{
+            reel.likes.push(userId)
+        }
+
+        await reel.save()
+
+        res.status(200).json({message : isAlreadyLiked? "Reel Unliked" : "Reel Liked", likes : reel.likes.length})
+        
+    } 
+    catch (error) {
+        return res.status(500).json({message : "Internal Server Error"})
+    }
+}
+
