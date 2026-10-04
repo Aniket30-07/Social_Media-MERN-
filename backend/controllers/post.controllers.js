@@ -91,7 +91,7 @@ export const updateLikes = async(req, res) =>{
 
         await post.save()
 
-        res.status(200).json({message : isAlreadyLiked? "Post Unliked" : "Post Liked", likes : post.likes.length})
+        res.status(200).json({message : isAlreadyLiked? "Post Unliked" : "Post Liked", likes : post.likes.length, liked : !isAlreadyLiked})
         
     } 
     catch (error) {
