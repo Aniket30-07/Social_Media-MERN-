@@ -110,6 +110,8 @@ export const updateLikes = async (req, res) => {
             likes: reel.likes.length,
             liked: !isAlreadyLiked
         });
+
+        //populate the user with username and in frontent in likes it should show the username and profile who liked it
     } catch (error) {
         return res.status(500).json({
             message: "Internal Server Error",
