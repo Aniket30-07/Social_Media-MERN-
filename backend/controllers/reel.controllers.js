@@ -91,7 +91,7 @@ export const updateLikes = async(req, res) =>{
 
         await reel.save()
 
-        res.status(200).json({message : isAlreadyLiked? "Reel Unliked" : "Reel Liked", likes : reel.likes.length})
+        res.status(200).json({message : isAlreadyLiked? "Reel Unliked" : "Reel Liked", likes : reel.likes.length, liked: !isAlreadyLiked})
         
     } 
     catch (error) {
